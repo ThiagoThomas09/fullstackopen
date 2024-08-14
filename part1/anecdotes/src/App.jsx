@@ -79,6 +79,9 @@ const App = () => {
     setVotes(copy);
   }
 
+  const maxVotes = Math.max(...votes)
+  const topAnecdoreIndex = votes.indexOf(maxVotes)
+
   return (
     <div>
       <Header />
@@ -87,10 +90,21 @@ const App = () => {
       <Button handleClick={()=>setBad(bad+1)} text="bad" />
       <Content />
       <Statistics good={good} neutral={neutral} bad={bad}/>
+      <h3>Anecdote of the day</h3>
       <p>{anecdotes[selected]}</p>
       <p>has {votes[selected]} votes</p>
       <button onClick={handleVotes}>vote</button>
       <button onClick={getRandomInt}>next anecdote</button>
+      <h3>Anecdotes with most votes</h3>
+      {maxVotes === 0 ? (
+        <p>No votes yet</p>
+      ) : (
+        <div>
+          <p>{anecdotes[topAnecdoreIndex]}</p>
+          <p>has {votes[topAnecdoreIndex]} votes</p>
+        </div>
+      )}
+      
 
     </div>
     
