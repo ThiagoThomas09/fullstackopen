@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+import nameService from './services/names'
 
 const Filter = ({searchName, handleSearchName}) => {
   return (
@@ -44,13 +44,12 @@ const App = () => {
   const [searchName, setSearchName] = useState('')
 
   useEffect(() => {
-    console.log('effect');
-    axios.get('http://localhost:3001/persons').then(response => {
-      console.log('promised fulfilled');
-      setPersons(response.data)
-    })
+    nameService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
+      })
   }, [])
-  console.log('render', persons.length, 'persons');
   
 
   const addName = (event) => {
@@ -69,10 +68,9 @@ const App = () => {
       name: newName,
       number: newNumber
     }
-    axios
-      .post('http://localhost:3001/persons', newPerson)
-      .then(response => {
-        setPersons(persons.concat(response.data))
+    nameService.create(newPerson)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
       })
