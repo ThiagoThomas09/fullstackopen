@@ -61,10 +61,31 @@ const App = () => {
     const nameExists = persons.some(person => person.name === newName)
 
     if (nameExists) {
-      alert(`${newName} is already added to phonebook`)
-      setNewName('')
-      setNewNumber('')
-      return
+      const confirmUpdate = window.confirm(
+        `${newName} is already added to phonebook, replace the old number with a new one?`
+      )
+
+      if (confirmUpdate) {
+        const existingPerson = persons.find(person => person.name === newName)
+
+        const updatedPerson = { ...existingPerson, number: newNumber}
+
+        nameService
+          .update(existingPerson.id, updatedPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id !== existingPerson.id ? person : returnedPerson))
+            setNewName('')
+            setNewNumber('')
+          })
+          .catch(error => {
+            alert('Error trying to update the person number', error)
+          })
+        return
+      } else {
+        setNewName('')
+        setNewNumber('')
+        return
+      }
     }
 
     const newPerson = { 
