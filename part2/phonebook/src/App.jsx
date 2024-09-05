@@ -40,13 +40,13 @@ const Persons = ({ filteredPersons, handleDelete }) => {
   )
 }
 
-const Notification = ({ message }) => {
+const Notification = ({ message, isError }) => {
   if (message === null) {
     return null
   }
 
   return (
-    <div className='success'>
+    <div className={isError ? 'error-message' : 'success-message'}>
       {message}
     </div>
   )
@@ -58,6 +58,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [searchName, setSearchName] = useState('')
   const [successMessage, setSuccessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     nameService
@@ -96,7 +97,10 @@ const App = () => {
             }, 5000)
           })
           .catch(error => {
-            alert('Error trying to update the person number', error)
+            setErrorMessage(`Information of ${newName} has been already removed from server`)
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
           })
         return
       } else {
@@ -159,7 +163,9 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={successMessage} />
+      <Notification message={successMessage} isError={false} />
+      <Notification message={errorMessage} isError={true} />
+
       <Filter searchName={searchName} handleSearchName={handleSearchName} />
       <h3>add a new</h3>
       <PersonForm
