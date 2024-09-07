@@ -4,9 +4,11 @@ import axios from 'axios';
 function App() {
   const [countries, setCountries] = useState([])
   const [search, setSearch] = useState('')
+  const [selectedCountry, setSelectedCountry] = useState(null)
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value)
+    setSelectedCountry(null);
   }
 
   useEffect(() => {
@@ -25,6 +27,10 @@ function App() {
     }
   }, [search])
 
+  const handleShowCountry = (country) => {
+    setSelectedCountry(country)
+  }
+
   return (
     <div>
       <label>find countries
@@ -41,7 +47,10 @@ function App() {
       {countries.length > 1 && countries.length <= 10 && (
         <ul>
           {countries.map(country => (
-            <li key={country.cca3}>{country.name.common}</li>
+            <li key={country.cca3}>
+              {country.name.common}
+              <button onClick={() => handleShowCountry(country)}>show</button>
+            </li>
           ))}
         </ul>
       )}
@@ -58,6 +67,21 @@ function App() {
           </ul>
           <img src={countries[0].flags.png} alt='flag'/>
         </div>
+      )}
+
+      {selectedCountry && (
+        <div>
+        <h1>{selectedCountry.name.common}</h1>
+        <p>capital: {selectedCountry.capital}</p>
+        <p>area: {selectedCountry.area}</p>
+        <h3>languages:</h3>
+        <ul>
+          {Object.keys(selectedCountry.languages).map((code) => (
+          <li key={code}>{selectedCountry.languages[code]}</li>
+          ))}
+        </ul>
+        <img src={selectedCountry.flags.png} alt='flag'/>
+      </div>
       )}
     </div>
   )
