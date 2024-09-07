@@ -5,10 +5,12 @@ function App() {
   const [countries, setCountries] = useState([])
   const [search, setSearch] = useState('')
   const [selectedCountry, setSelectedCountry] = useState(null)
+  const [weather, setWeather] = useState(null)
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value)
     setSelectedCountry(null);
+    setWeather(null);
   }
 
   useEffect(() => {
@@ -24,8 +26,37 @@ function App() {
         .catch(error => {
           console.log('Error fetching countries', error);
         })
+    } else {
+      setCountries([])
     }
   }, [search])
+
+  useEffect(() => {
+    if(countries.length === 1) {
+      setSelectedCountry(countries[0]);
+    }
+  }, [countries])
+
+  useEffect(() => {
+    if (selectedCountry) {
+      const api_key = import.meta.env.VITE_OPENWEATHER_API_KEY;
+      
+      const capital = selectedCountry.capital[0]
+      
+      const weatherApiUrl = `http://api.openweathermap.org/data/2.5/weather?q=${capital}&APPID=${api_key}&units=metric`
+
+      axios
+        .get(weatherApiUrl)
+        .then(response => {
+          setWeather(response.data)
+        })
+        .catch(error => {
+          console.log('Error', error);
+        })
+    }
+  }, [selectedCountry])
+
+
 
   const handleShowCountry = (country) => {
     setSelectedCountry(country)
@@ -54,20 +85,6 @@ function App() {
           ))}
         </ul>
       )}
-      {countries.length === 1 && (
-        <div>
-          <h1>{countries[0].name.common}</h1>
-          <p>capital: {countries[0].capital}</p>
-          <p>area: {countries[0].area}</p>
-          <h3>languages:</h3>
-          <ul>
-            {Object.keys(countries[0].languages).map((code) => (
-            <li key={code}>{countries[0].languages[code]}</li>
-            ))}
-          </ul>
-          <img src={countries[0].flags.png} alt='flag'/>
-        </div>
-      )}
 
       {selectedCountry && (
         <div>
@@ -82,6 +99,16 @@ function App() {
         </ul>
         <img src={selectedCountry.flags.png} alt='flag'/>
       </div>
+      )}
+
+      {weather && (
+        <div>
+          <h3>Weather in {weather.name}</h3>
+          <p>Temperature: {weather.main.temp} Celsius</p>
+          <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
+          alt="weather icon" />
+          <p>wind {weather.wind.speed} m/s</p>
+        </div>
       )}
     </div>
   )
